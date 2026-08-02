@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Our Mountain Universe</title>
+  <style>
+    /* ==================== СТИЛИ И СБРОС ==================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #030308;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #ffffff;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      perspective: 1000px;
+    }
+
+    .layer {
+      position: absolute;
+      transition: transform 0.1s ease-out;
+      background-size: cover;
+      background-position: center;
+      will-change: transform;
+    }
+
+    .layer-background {
+      z-index: 1;
+      top: -5%;
+      left: -5%;
+      width: 110%;
+      height: 110%;
+      background-image: url('scene.jpg');
+    }
+
+    /* МЕЛКИЕ МЕРЦАЮЩИЕ ЗВЁЗДЫ НА ФОНЕ */
+    .bg-star {
+      position: absolute;
+      background-color: #ffffff;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+      animation: bgTwinkle linear infinite alternate;
+    }
+
+    @keyframes bgTwinkle {
+      0% {
+        opacity: 0.2;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 0.95;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+      }
+      100% {
+        opacity: 0.25;
+        transform: scale(1.1);
+      }
+    }
+
+    /* Эффект огней у костра */
+    .campfire-lights {
+      position: absolute;
+      bottom: 25%;
+      left: 20%;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(255, 150, 50, 0.4), transparent 70%);
+      animation: pulseLights 3s infinite alternate;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @keyframes pulseLights {
+      0% { opacity: 0.2; transform: scale(0.9); }
+      100% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    /* ==================== МЛЕЧНЫЙ ПУТЬ / ВИДЕО ==================== */
+    .galaxy-video-container {
+      position: absolute;
+      top: 30%;
+      left: 55%;
+      transform: translate(-50%, -50%);
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 35px rgba(255, 255, 255, 0.7), 0 0 70px rgba(138, 180, 248, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      z-index: 4;
+      cursor: pointer;
+    }
+
+    .galaxy-video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ==================== ГЛАВНЫЕ ЗВЁЗДЫ ==================== */
+    .star {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ffffff, 0 0 20px #8ab4f8;
+      cursor: pointer;
+      z-index: 4;
+      animation: twinkle 2.5s infinite alternate ease-in-out;
+    }
+
+    .star::after {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: pulseRing 2.5s infinite ease-out;
+    }
+
+    .star-red {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background-color: #ff4d4d;
+      border-radius: 50%;
+      box-shadow: 0 0 15px #ff4d4d, 0 0 30px #ff1a1a;
+      cursor: pointer;
+      z-index: 5;
+      animation: twinkleRed 2s infinite alternate ease-in-out;
+    }
+
+    .star-red::after {
+      content: '';
+      position: absolute;
+      top: -5px; left: -5px; right: -5px; bottom: -5px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 77, 77, 0.6);
+      animation: pulseRing 2s infinite ease-out;
+    }
+
+    @keyframes twinkle {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      100% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 8px #fff); }
+    }
+
+    @keyframes twinkleRed {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.35); opacity: 1; filter: drop-shadow(0 0 12px #ff4d4d); }
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    .star-fall {
+      animation: starFalling 0.9s forwards cubic-bezier(0.25, 1, 0.5, 1) !important;
+    }
+
+    @keyframes starFalling {
+      0% { opacity: 1; }
+      50% { box-shadow: -20px 20px 30px 6px #ffffff, -50px 50px 60px 10px #8ab4f8; }
+      100% { transform: translate(-280px, 450px) scale(0.05); opacity: 0; }
+    }
+
+    /* ПАДАЮЩАЯ ЗВЕЗДА (ПАСХАЛКА) */
+    .shooting-star {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(-45deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+      border-radius: 999px;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+      animation: tail 1.8s ease-in-out, shooting 1.8s ease-in-out;
+      z-index: 3;
+      cursor: pointer;
+    }
+
+    @keyframes tail {
+      0% { width: 0; }
+      30% { width: 100px; }
+      100% { width: 0; }
+    }
+
+    @keyframes shooting {
+      0% { transform: translateX(0) translateY(0) rotate(-35deg); }
+      100% { transform: translateX(-300px) translateY(300px) rotate(-35deg); }
+    }
+
+    /* МОДАЛЬНЫЕ ОКНА */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 3, 10, 0.7);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 100;
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .modal-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 18px;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+      transform: scale(0.9);
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .note-card {
+      background: rgba(40, 10, 15, 0.3);
+      border: 1px solid rgba(255, 100, 100, 0.25);
+      box-shadow: 0 0 30px rgba(255, 50, 50, 0.2);
+    }
+
+    .secret-card {
+      background: rgba(20, 30, 50, 0.4);
+      border: 1px solid rgba(138, 180, 248, 0.3);
+      box-shadow: 0 0 30px rgba(138, 180, 248, 0.2);
+    }
+
+    .note-title {
+      font-size: 1.2rem;
+      color: #ff8080;
+      margin-bottom: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .secret-title {
+      font-size: 1.2rem;
+      color: #8ab4f8;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .note-text {
+      font-size: 0.98rem;
+      color: rgba(255, 240, 240, 0.95);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: left;
+      white-space: pre-line;
+    }
+
+    .modal-overlay.active .modal-card { transform: scale(1); }
+
+    .modal-card img {
+      width: 100%; max-height: 300px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .modal-date {
+      font-size: 0.9rem; letter-spacing: 1.8px;
+      text-transform: uppercase; color: #a0c4ff;
+      margin-bottom: 8px; font-weight: 500;
+    }
+
+    .modal-caption {
+      font-size: 0.95rem; color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 18px; line-height: 1.5;
+    }
+
+    .close-btn {
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; padding: 12px 28px;
+      border-radius: 30px; font-size: 0.95rem;
+      cursor: pointer; outline: none;
+      backdrop-filter: blur(5px);
+      transition: background 0.3s;
+    }
+
+    .close-btn:active { background: rgba(255, 255, 255, 0.3); }
+  </style>
+</head>
+<body>
+
+  <div class="scene" id="scene">
+    <div class="layer layer-background" id="layer-background">
+      <!-- Свет от костра -->
+      <div class="campfire-lights"></div>
+
+      <!-- Главное видео в центре Млечного Пути -->
+      <div class="galaxy-video-container" onclick="openVideoModal()">
+        <video autoplay loop muted playsinline id="galaxyVideo">
+          <source src="video.mp4" type="video/mp4">
+        </video>
+      </div>
+
+      <!-- 10 ОБЫЧНЫХ ЗВЁЗД -->
+      <div class="star" style="top: 10%; left: 15%;" onclick="openStarMemory(0, this)"></div>
+      <div class="star" style="top: 15%; left: 85%;" onclick="openStarMemory(1, this)"></div>
+      <div class="star" style="top: 22%; left: 10%;" onclick="openStarMemory(2, this)"></div>
+      <div class="star" style="top: 28%; left: 90%;" onclick="openStarMemory(3, this)"></div>
+      <div class="star" style="top: 5%;  left: 55%;" onclick="openStarMemory(4, this)"></div>
+      <div class="star" style="top: 35%; left: 18%;" onclick="openStarMemory(5, this)"></div>
+      <div class="star" style="top: 38%; left: 80%;" onclick="openStarMemory(6, this)"></div>
+      <div class="star" style="top: 18%; left: 35%;" onclick="openStarMemory(7, this)"></div>
+      <div class="star" style="top: 18%; left: 70%;" onclick="openStarMemory(8, this)"></div>
+      <div class="star" style="top: 45%; left: 12%;" onclick="openStarMemory(9, this)"></div>
+
+      <!-- КРАСНАЯ ЗВЕЗДА -->
+      <div class="star-red" style="top: 42%; left: 55%; transform: translateX(-50%);" onclick="openNoteModal(this)"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНЫЕ ОКНА -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <img id="modalImg" src="" alt="Memory">
+      <div class="modal-date" id="modalDate">00.00.0000</div>
+      <div class="modal-caption" id="modalCaption">Описание воспоминания</div>
+      <button class="close-btn" onclick="closeModal()">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="noteOverlay">
+    <div class="modal-card note-card">
+      <div class="note-title">✨ Сен үшін кішкентай секрет</div>
+      <div class="note-text" id="noteText">
+Аяу жаным сүйем сені тап сендей қызбен жолығып араласқаныма ешқашан өкінбеймін❤️🦭 ты для меня просто целый мир и білесіңба мен не хочу тебя потерять никогдаа в жизни мен прям всю жизнь сені ғана жақсы көріп сүйіп өткім келеді🥰❤️
+      </div>
+      <button class="close-btn" onclick="closeNoteModal()">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="secretOverlay">
+    <div class="modal-card secret-card">
+      <div class="secret-title">🌠 Загадай желание!</div>
+      <div class="note-text">
+        Ты успела поймать падающую звезду! Пусть всё, о чём ты мечтаешь, обязательно сбудется. ❤️
+      </div>
+      <button class="close-btn" onclick="closeSecretModal()">Закрыть</button>
+    </div>
+  </div>
+
+  <audio id="bgAudio" src=""></audio>
+
+  <script>
+     const memories = [
+      { photo: 'photo1.jpg', date: '01.08.2026', caption: 'Мен сені сүйемін❤️.', audio: 'music1.mp3' },
+      { photo: 'photo2.jpg', date: '19.07.2026', caption: 'Сенен айырылғым келмейді❤️.', audio: 'music2.mp3' },
+      { photo: 'photo3.jpg', date: '17.06.2026', caption: 'ты для меня целый мир❤️.', audio: 'music3.mp3' },
+      { photo: 'photo4.jpg', date: '14.02.2026', caption: 'Только рядом с тобой я счастлив❤️.', audio: 'music4.mp3' },
+      { photo: 'photo5.jpg', date: '18.07.2026', caption: 'Всююю жизнь хочу лишь быть с тобою вместе❤️.', audio: 'music5.mp3' },
+      { photo: 'photo6.jpg', date: '',           caption: 'Сен-менің бақытымсың ❤️', audio: 'music6.mp3' },
+      { photo: 'photo7.jpg', date: '01.08.2026', caption: 'Полюбив тебя я понял что не любил никого никогда❤️.', audio: 'music7.mp3' },
+      { photo: 'photo8.jpg', date: '18.07.2026', caption: 'Ты самая прекрасная девушка в моей жизни❤️.', audio: 'music8.mp3' },
+      { photo: 'photo9.jpg', date: '25.05.2026', caption: 'Ты мой вечный вавилон❤️.', audio: 'music9.mp3' },
+      { photo: 'photo10.jpg', date: '30.07.2026', caption: 'И просто знай и помни я люблю тебя и не хочу потерять❤️.', audio: 'music10.mp3' }
+    ];
+
+    let activeStarElement = null;
+    const audioPlayer = document.getElementById('bgAudio');
+
+    function openStarMemory(index, starEl) {
+      if (starEl.classList.contains('clicked')) return;
+      activeStarElement = starEl;
+
+      const data = memories[index];
+      document.getElementById('modalImg').src = data.photo;
+      document.getElementById('modalDate').innerText = data.date;
+      document.getElementById('modalCaption').innerText = data.caption;
+
+      if (data.audio) {
+        audioPlayer.src = data.audio;
+        audioPlayer.play().catch(() => {});
+      }
+
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+      audioPlayer.pause();
+      audioPlayer.currentTime = 0;
+
+      if (activeStarElement) {
+        activeStarElement.classList.add('clicked', 'star-fall');
+        activeStarElement.style.pointerEvents = 'none';
+      }
+    }
+
+    function openNoteModal(starEl) {
+      if (starEl.classList.contains('clicked')) return;
+      activeStarElement = starEl;
+      document.getElementById('noteOverlay').classList.add('active');
+    }
+
+    function closeNoteModal() {
+      document.getElementById('noteOverlay').classList.remove('active');
+      if (activeStarElement) {
+        activeStarElement.classList.add('clicked', 'star-fall');
+        activeStarElement.style.pointerEvents = 'none';
+      }
+    }
+
+    function closeSecretModal() {
+      document.getElementById('secretOverlay').classList.remove('active');
+    }
+
+    function openVideoModal() {
+      const vid = document.getElementById('galaxyVideo');
+      vid.muted = !vid.muted;
+      if (!vid.muted) vid.play();
+    }
+
+    /* Генерация фонового мерцания звёзд */
+    function generateBackgroundStars() {
+      const layerBG = document.getElementById('layer-background');
+      const starCount = 50;
+
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'bg-star';
+
+        const topPos = Math.random() * 45;
+        const leftPos = Math.random() * 100;
+        const size = Math.random() * 2 + 1;
+        const duration = Math.random() * 3 + 2;
+        const delay = Math.random() * 3;
+
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.top = `${topPos}%`;
+        star.style.left = `${leftPos}%`;
+        star.style.animationDuration = `${duration}s`;
+        star.style.animationDelay = `${delay}s`;
+
+        layerBG.appendChild(star);
+      }
+    }
+    generateBackgroundStars();
+
+    /* Падающая звезда (пасхалка) */
+    function createShootingStar() {
+      const layerBG = document.getElementById('layer-background');
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+
+      const topPos = Math.random() * 25 + 5;
+      const leftPos = Math.random() * 40 + 50; 
+
+      star.style.top = topPos + '%';
+      star.style.left = leftPos + '%';
+
+      star.onclick = function(e) {
+        e.stopPropagation();
+        star.remove();
+        document.getElementById('secretOverlay').classList.add('active');
+      };
+
+      layerBG.appendChild(star);
+
+      setTimeout(() => {
+        if (star.parentNode) star.remove();
+      }, 1800);
+    }
+
+    function loopShootingStars() {
+      const randomDelay = Math.random() * 4000 + 4000;
+      setTimeout(() => {
+        createShootingStar();
+        loopShootingStars();
+      }, randomDelay);
+    }
+    loopShootingStars();
+
+    /* Параллакс */
+    const backLayer = document.getElementById('layer-background');
+
+    function applyParallax(moveX, moveY) {
+      backLayer.style.transform = `translate(${moveX * 12}px, ${moveY * 12}px)`;
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      const moveX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+      const moveY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      applyParallax(moveX, moveY);
+    });
+
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.gamma !== null && e.beta !== null) {
+        const moveX = Math.min(Math.max(e.gamma / 25, -1), 1);
+        const moveY = Math.min(Math.max((e.beta - 45) / 25, -1), 1);
+        applyParallax(moveX, moveY);
+      }
+    });
+  </script>
+</body>
+</html>
