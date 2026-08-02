@@ -302,12 +302,65 @@
     }
 
     .close-btn:active { background: rgba(255, 255, 255, 0.3); }
+
+    /* РОМАНТИКАЛЫҚ ТАЙМЕР СТИЛІ */
+    .romantic-timer-card {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 182, 193, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 8px 18px;
+      border-radius: 25px;
+      text-align: center;
+      z-index: 99;
+      box-shadow: 0 4px 25px rgba(255, 105, 180, 0.25);
+      pointer-events: none;
+    }
+
+    .timer-title {
+      font-size: 0.7rem;
+      color: #ffb6c1;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .beating-heart {
+      display: inline-block;
+      color: #ff4d6d;
+      animation: heartBeat 1.2s infinite ease-in-out;
+    }
+
+    .timer-values {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 182, 193, 0.8);
+      font-family: monospace, sans-serif;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
   </style>
 </head>
 <body>
 
   <div class="scene" id="scene">
+    <!-- РОМАНТИКАЛЫҚ ТАЙМЕР -->
+    <div class="romantic-timer-card">
+      <div class="timer-title">БІЗ БІРГЕ ЖҮРГЕНГЕ <span class="beating-heart">❤️</span></div>
+      <div class="timer-values" id="loveTimerValues">0 күн, 0 сағ, 0 мин, 0 сек</div>
+    </div>
+
     <div class="layer layer-background" id="layer-background">
+
       <!-- Свет от костра -->
       <div class="campfire-lights"></div>
 
@@ -368,7 +421,7 @@
   <audio id="bgAudio" src=""></audio>
 
   <script>
-     const memories = [
+    const memories = [
       { photo: 'photo1.jpg', date: '01.08.2026', caption: 'Мен сені сүйемін❤️.', audio: 'music1.mp3' },
       { photo: 'photo2.jpg', date: '19.07.2026', caption: 'Сенен айырылғым келмейді❤️.', audio: 'music2.mp3' },
       { photo: 'photo3.jpg', date: '17.06.2026', caption: 'ты для меня целый мир❤️.', audio: 'music3.mp3' },
@@ -517,6 +570,33 @@
         applyParallax(moveX, moveY);
       }
     });
+
+    /* ==========================================
+       УАҚЫТ ТАЙМЕРІ (22 Маусым 2026)
+    ========================================== */
+    function updateLoveTimer() {
+      // 2026 жылдың 22 маусымы (ай индексі 5 = Июнь)
+      const startDate = new Date(2026, 5, 22, 0, 0, 0); 
+      const now = new Date();
+
+      const diffInMs = now - startDate;
+
+      if (diffInMs < 0) {
+        document.getElementById('loveTimerValues').innerText = "Бақытты күндеріміз басталады ✨";
+        return;
+      }
+
+      const days = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffInMs / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diffInMs / (1000 * 60)) % 60);
+      const seconds = Math.floor((diffInMs / 1000) % 60);
+
+      document.getElementById('loveTimerValues').innerText = 
+        `${days} күн, ${hours} сағ, ${minutes} мин, ${seconds} сек`;
+    }
+
+    setInterval(updateLoveTimer, 1000);
+    updateLoveTimer();
   </script>
 </body>
 </html>
