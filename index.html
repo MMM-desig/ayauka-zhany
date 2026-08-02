@@ -303,28 +303,27 @@
 
     .close-btn:active { background: rgba(255, 255, 255, 0.3); }
 
-    /* РОМАНТИКАЛЫҚ ТАЙМЕР СТИЛІ */
+    /* РОМАНТИКАЛЫҚ ТАЙМЕР СТИЛІ (ОҢ ЖАҚ ТӨМЕНГІ БҰРЫШ) */
     .romantic-timer-card {
       position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.65);
-      border: 1px solid rgba(255, 182, 193, 0.35);
+      bottom: 20px; /* Төменнен орналастыру */
+      right: 15px;  /* Оң жақ бұрыш */
+      background: rgba(15, 23, 42, 0.85); /* Төмендегі белгіні толық жабу үшін сәл қоюлау */
+      border: 1px solid rgba(255, 182, 193, 0.4);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding: 8px 18px;
-      border-radius: 25px;
+      padding: 6px 14px;
+      border-radius: 18px;
       text-align: center;
       z-index: 99;
-      box-shadow: 0 4px 25px rgba(255, 105, 180, 0.25);
-      pointer-events: none;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 105, 180, 0.25);
+      pointer-events: auto;
     }
 
     .timer-title {
-      font-size: 0.7rem;
+      font-size: 0.6rem;
       color: #ffb6c1;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       font-weight: 500;
       margin-bottom: 2px;
       text-transform: uppercase;
@@ -337,10 +336,10 @@
     }
 
     .timer-values {
-      font-size: 0.95rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #ffffff;
-      text-shadow: 0 0 10px rgba(255, 182, 193, 0.8);
+      text-shadow: 0 0 8px rgba(255, 182, 193, 0.8);
       font-family: monospace, sans-serif;
     }
 
@@ -353,7 +352,7 @@
 <body>
 
   <div class="scene" id="scene">
-    <!-- РОМАНТИКАЛЫҚ ТАЙМЕР -->
+    <!-- РОМАНТИКАЛЫҚ ТАЙМЕР (ОҢ ЖАҚ ТӨМЕНДЕ) -->
     <div class="romantic-timer-card">
       <div class="timer-title">БІЗ БІРГЕ ЖҮРГЕНГЕ <span class="beating-heart">❤️</span></div>
       <div class="timer-values" id="loveTimerValues">0 күн, 0 сағ, 0 мин, 0 сек</div>
@@ -575,7 +574,6 @@
        УАҚЫТ ТАЙМЕРІ (22 Маусым 2026)
     ========================================== */
     function updateLoveTimer() {
-      // 2026 жылдың 22 маусымы (ай индексі 5 = Июнь)
       const startDate = new Date(2026, 5, 22, 0, 0, 0); 
       const now = new Date();
 
